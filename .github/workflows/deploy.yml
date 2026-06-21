@@ -1,50 +1,35 @@
+# Deploy to GitHub Pages
 name: Deploy to GitHub Pages
 
 on:
   push:
-    branches:
-      - main
-      - master
+    branches: ["main"]
+  workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: 'pages'
-  cancel-in-progress: true
+  contents: write
 
 jobs:
   deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
         with:
-          node-size: '20'
-          cache: 'npm'
+          bun-version: latest
 
-      - name: Install Dependencies
-        run: npm install
+      - name: Install dependencies
+        run: bun install
 
-      - name: Build Application
-        run: npm run build
+      - name: Build
+        run: bun run build
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload Artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: Deploy to gh-pages
+        uses: peaceiris/actions-gh-pages@v3
         with:
-          path: './dist'
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          publish_branch: gh-pages
