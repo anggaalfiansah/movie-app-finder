@@ -4,5 +4,5 @@ import react from '@vitejs/plugin-react'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
-  base: '/movie-app-finder/',
+  base: process.env.GITHUB_ACTIONS ? '/movie-app-finder/' : '/',
 })
